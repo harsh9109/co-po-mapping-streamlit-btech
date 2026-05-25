@@ -8,6 +8,7 @@ Streamlit web application for **Outcome-Based Education (OBE)** analytics aligne
 ## Features
 
 - BTech theory: **CCE 1–CCE 5** + **End Semester**; configurable max marks and weightages (defaults 10 / 10 / … / 50 and 40:60)
+- Default outcome structure: **5 COs**, **11 POs**, and **3 PSOs**
 - **Practical mode** (optional): internal + configurable external components — unchanged workflow
 - CO internal, university, and final attainment; **PO** and **PSO** contribution tables
 - **Discrimination Index** with configurable top %, bottom %, and threshold

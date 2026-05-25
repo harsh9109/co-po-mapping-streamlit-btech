@@ -72,7 +72,7 @@ html,body,[class*="css"]{font-family:'Plus Jakarta Sans',system-ui,sans-serif!im
     radial-gradient(ellipse 60% 40% at 100% 0%,rgba(6,182,212,.06),transparent 50%),
     linear-gradient(180deg,#f4f6fb 0%,#eef2f8 100%)!important;
 }
-.main .block-container{padding:0.65rem 1.25rem 1.25rem;max-width:100%}
+.main .block-container{padding:0.4rem 1rem 0.9rem;max-width:100%}
 
 /* Tighten Streamlit default vertical gaps */
 .main [data-testid="stVerticalBlock"]{gap:0.4rem!important}
@@ -125,24 +125,10 @@ html,body,[class*="css"]{font-family:'Plus Jakarta Sans',system-ui,sans-serif!im
   letter-spacing:.35px;white-space:nowrap;
 }
 
-.hero-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:0 0 20px}
-.hero-stat{
-  position:relative;overflow:hidden;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:16px 18px;box-shadow:var(--shadow-sm);
-}
-.hero-stat::after{
-  content:'';position:absolute;right:-28px;top:-28px;width:88px;height:88px;border-radius:50%;
-  background:radial-gradient(circle,rgba(99,102,241,.1) 0%,transparent 70%);
-}
-.hero-k{font-size:10px;font-weight:700;letter-spacing:.65px;text-transform:uppercase;color:var(--muted)}
-.hero-v{font-size:24px;font-weight:800;color:var(--ink);line-height:1.15;margin-top:6px}
-.hero-s{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
-
 .section-head{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.35px;margin:0 0 4px}
-.section-sub{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 8px}
+.section-sub{font-size:12.5px;color:var(--muted);line-height:1.45;margin:0 0 6px}
 
-.ready-strip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.ready-strip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
 .ready-pill{
   display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;
   font-size:11px;font-weight:700;letter-spacing:.15px;border:1px solid transparent;
@@ -154,16 +140,16 @@ html,body,[class*="css"]{font-family:'Plus Jakarta Sans',system-ui,sans-serif!im
 
 .empty-state{
   background:var(--surface);border:1.5px dashed var(--border-strong);
-  border-radius:var(--radius-xl);padding:22px 20px;margin:6px 0 10px;text-align:center;
+  border-radius:var(--radius-xl);padding:16px 18px;margin:4px 0 8px;text-align:center;
   box-shadow:var(--shadow-sm);
 }
 .empty-title{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.25px}
-.empty-copy{font-size:13px;color:var(--muted);line-height:1.75;max-width:640px;margin:10px auto 0}
+.empty-copy{font-size:13px;color:var(--muted);line-height:1.65;max-width:640px;margin:8px auto 0}
 
 .chart-note,.preview-note{font-size:12.5px;color:var(--muted);line-height:1.65;margin:0 0 10px}
 
 .download-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:10px 0 18px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:8px 0 14px;
 }
 .download-card{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
@@ -179,12 +165,12 @@ html,body,[class*="css"]{font-family:'Plus Jakarta Sans',system-ui,sans-serif!im
 .stitle{
   font-size:13.5px;font-weight:800;color:var(--ink);
   border-left:3px solid var(--primary);padding-left:12px;
-  margin:10px 0 6px;letter-spacing:-.1px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin:8px 0 5px;letter-spacing:-.1px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
 }
 .stitle:first-child,.block-card>.stitle{margin-top:0!important}
 .stitle-meta{font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
 
-.mstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;margin-bottom:12px}
+.mstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;margin-bottom:10px}
 .mbox{
   background:var(--surface);border-radius:var(--radius-md);padding:12px 14px;
   box-shadow:var(--shadow-sm);border:1px solid var(--border);
@@ -241,11 +227,11 @@ html,body,[class*="css"]{font-family:'Plus Jakarta Sans',system-ui,sans-serif!im
 
 .stTabs [data-baseweb="tab-list"]{
   background:var(--surface);border-radius:var(--radius-md);padding:5px;gap:5px;
-  border:1px solid var(--border);box-shadow:var(--shadow-xs);margin-bottom:10px;
+  border:1px solid var(--border);box-shadow:var(--shadow-xs);margin-bottom:8px;
 }
 .stTabs [data-baseweb="tab"]{
   font-size:12.5px;font-weight:700;color:var(--muted);
-  padding:11px 20px;border-radius:var(--radius-sm);transition:all .2s;
+  padding:10px 18px;border-radius:var(--radius-sm);transition:all .2s;
 }
 .stTabs [data-baseweb="tab"]:hover{color:var(--ink)}
 .stTabs [aria-selected="true"]{
@@ -298,7 +284,7 @@ div[data-testid="stRadio"] label p{font-weight:600!important;font-size:13px!impo
 [data-testid="stVerticalBlockBorderWrapper"]{
   border-radius:var(--radius-lg);border:1px solid var(--border);
   background:var(--surface);box-shadow:var(--shadow-sm);
-  padding:0.65rem 0.85rem!important;margin-bottom:0.5rem!important;
+  padding:0.55rem 0.75rem!important;margin-bottom:0.35rem!important;
 }
 [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] p{line-height:1.7;color:var(--ink-soft)}
 
@@ -323,7 +309,7 @@ div[data-testid="stRadio"] label p{font-weight:600!important;font-size:13px!impo
 
 .di-config{
   background:linear-gradient(135deg,#fffbeb,#fef3c7);
-  border:1px solid #fde68a;border-radius:var(--radius-md);padding:16px 20px;margin:12px 0;
+  border:1px solid #fde68a;border-radius:var(--radius-md);padding:14px 18px;margin:10px 0;
 }
 
 .insight-card{
@@ -339,7 +325,7 @@ div[data-testid="stRadio"] label p{font-weight:600!important;font-size:13px!impo
 
 .block-card{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:12px 14px;margin:0 0 12px;box-shadow:var(--shadow-xs);
+  padding:11px 13px;margin:0 0 10px;box-shadow:var(--shadow-xs);
 }
 .table-block{margin:4px 0 10px}
 .tbl-scroll-hint{
@@ -357,7 +343,7 @@ div[data-testid="stRadio"] label p{font-weight:600!important;font-size:13px!impo
 [data-testid="stWidgetLabel"] p{
   font-weight:600!important;color:var(--ink-soft)!important;font-size:13px!important;
 }
-.stTabs [data-baseweb="tab-panel"]{padding-top:0}
+.stTabs [data-baseweb="tab-panel"]{padding-top:0;padding-bottom:0}
 [data-testid="stPlotlyChart"]{margin-bottom:0.35rem!important}
 [data-testid="stPlotlyChart"]>div{min-height:0!important}
 .stButton>button[kind="secondary"]{
@@ -377,10 +363,8 @@ div[data-testid="stAlert"]{border-radius:var(--radius-sm)!important}
 @media (max-width:860px){
   .nba-hdr{padding:22px 20px;gap:14px;flex-wrap:wrap}
   .hdr-pills{margin-left:0}
-  .hero-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:560px){
-  .hero-strip{grid-template-columns:1fr}
   .hdr-title{font-size:18px}
   .mv{font-size:23px}
 }
@@ -428,8 +412,8 @@ def _attainment_status_short(value: float, threshold: float = 2.0) -> str:
 # ══════════════════════════════════════════════════════════════════════════
 #  CONSTANTS
 # ══════════════════════════════════════════════════════════════════════════
-NUM_COS  = 6
-NUM_POS  = 12
+NUM_COS  = 5
+NUM_POS  = 11
 NUM_PSOS = 3
 
 INTERNAL_EXAMS = ["CCE 1", "CCE 2", "CCE 3", "CCE 4", "CCE 5"]
@@ -467,16 +451,14 @@ DEFAULT_CO_STMTS  = [
     "Analyze the features of PIC 18F XXXX",
     "Describe the programming details in peripheral support",
     "Develop interfacing models according to applications",
-    "Evaluate the serial communication details and interfaces",
 ]
 
 DEFAULT_COPO = [
-    [3, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-    [3, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-    [3, 3, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
-    [3, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-    [3, 0, 3, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-    [3, 1, 3, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+    [3, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0],
+    [3, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0],
+    [3, 3, 1, 1, 1, 0, 1, 0, 0, 0, 0],
+    [3, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0],
+    [3, 0, 3, 1, 1, 1, 0, 0, 0, 0, 0],
 ]
 
 DEFAULT_COPSO = [
@@ -485,7 +467,6 @@ DEFAULT_COPSO = [
     [1, 2, 0],
     [1, 2, 1],
     [1, 1, 2],
-    [1, 0, 2],
 ]
 
 DEFAULT_COEXAM = [
@@ -493,7 +474,6 @@ DEFAULT_COEXAM = [
     [1, 0, 0, 0, 1, 0],
     [0, 1, 0, 1, 0, 1],
     [0, 1, 0, 1, 0, 1],
-    [0, 0, 1, 0, 0, 1],
     [0, 0, 1, 0, 0, 1],
 ]
 
@@ -1874,6 +1854,19 @@ def init_state():
         if _ex not in mm:
             mm[_ex] = _mv
 
+    # Keep persisted state aligned with the configured CO / PO dimensions.
+    co_stmts = list(st.session_state.get("co_stmts", []))
+    if len(co_stmts) != NUM_COS:
+        st.session_state.co_stmts = list(DEFAULT_CO_STMTS) if not co_stmts else (co_stmts + [""] * NUM_COS)[:NUM_COS]
+
+    results = st.session_state.get("results")
+    if isinstance(results, dict) and results:
+        result_cos = len(results.get("co_names", []))
+        result_pos = len(results.get("po_finals", []))
+        if result_cos != NUM_COS or result_pos != NUM_POS:
+            st.session_state.results = {}
+            st.session_state.processed = False
+
 init_state()
 
 
@@ -2028,7 +2021,7 @@ def run_app():
                 st.markdown('<div class="ainfo">External attainment in Practical mode is computed by combining all configured external components per student.</div>', unsafe_allow_html=True)
 
         internal_exams, external_exams, all_exams = get_exam_sets(mode)
-        col_L, col_R = st.columns([1.05, 1], gap="medium")
+        col_L, col_R = st.columns([1.08, 0.92], gap="small")
         setup_pills = [
             ("neutral", f"{mode} mode active"),
             ("neutral", f"{len(all_exams)} exam column(s) expected"),
@@ -2192,19 +2185,19 @@ def run_app():
                 df_coexam_init = pd.DataFrame(DEFAULT_COEXAM, index=co_names_cur, columns=all_exams)
             else:
                 df_coexam_init = pd.DataFrame(np.ones((NUM_COS, len(all_exams))), index=co_names_cur, columns=all_exams)
-            edited_coexam  = st.data_editor(df_coexam_init, key=f"coexam_ed_{mode}",
+            edited_coexam  = st.data_editor(df_coexam_init, key=f"coexam_ed_{mode}_{NUM_COS}",
                                             width="stretch", num_rows="fixed",
                                             column_config={e: st.column_config.NumberColumn(e, min_value=0, max_value=1, step=1) for e in all_exams})
 
             ui_stitle("CO–PO Mapping (0 = None to 3 = High)")
             df_copo_init  = pd.DataFrame(DEFAULT_COPO, index=co_names_cur, columns=po_cols)
-            edited_copo   = st.data_editor(df_copo_init, key="copo_ed",
+            edited_copo   = st.data_editor(df_copo_init, key=f"copo_ed_{NUM_COS}_{NUM_POS}",
                                            width="stretch", num_rows="fixed",
                                            column_config={c: st.column_config.NumberColumn(c, min_value=0, max_value=3, step=1) for c in po_cols})
 
             ui_stitle("CO–PSO Mapping (0 = None to 3 = High)")
             df_copso_init = pd.DataFrame(DEFAULT_COPSO, index=co_names_cur, columns=pso_cols)
-            edited_copso  = st.data_editor(df_copso_init, key="copso_ed",
+            edited_copso  = st.data_editor(df_copso_init, key=f"copso_ed_{NUM_COS}_{NUM_PSOS}",
                                            width="stretch", num_rows="fixed",
                                            column_config={c: st.column_config.NumberColumn(c, min_value=0, max_value=3, step=1) for c in pso_cols})
 
