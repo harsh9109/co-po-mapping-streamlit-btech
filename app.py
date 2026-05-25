@@ -432,6 +432,7 @@ DEFAULT_MAX = {
 }
 DEFAULT_INTERNAL_WEIGHT   = 40.0
 DEFAULT_UNIVERSITY_WEIGHT = 60.0
+DEFAULT_CO_TARGET        = 2.0
 DEFAULT_DI_TOP_PCT        = 27.0
 DEFAULT_DI_BOT_PCT        = 27.0
 DEFAULT_DI_THRESHOLD      = 0.20
@@ -470,11 +471,11 @@ DEFAULT_COPSO = [
 ]
 
 DEFAULT_COEXAM = [
-    [1, 0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 1, 0],
-    [0, 1, 0, 1, 0, 1],
-    [0, 1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 0, 1],
+    [0, 1, 0, 0, 0, 1],
     [0, 0, 1, 0, 0, 1],
+    [0, 0, 0, 1, 0, 1],
+    [0, 0, 0, 0, 1, 1],
 ]
 
 # Colour constants
@@ -840,11 +841,11 @@ def render_di_table(exam_di_dict, top_pct, bot_pct, threshold, internal_exams):
     for exam, d in exam_di_dict.items():
         t    = "Internal" if exam in internal_exams else "External"
         ok   = d["DI"] >= threshold
-        stat = '<span class="good-di">Good</span>' if ok else '<span class="warn">Low</span>'
+        stat = "Good" if ok else "Low"
         rows.append([exam, t, d["N"],
                      f'{d["H"]:.4f}', f'{d["L"]:.4f}',
                      d["k_top"], d["k_bot"],
-                     f'<span class="{"good-di" if ok else "warn"}">{d["DI"]:.4f}</span>',
+                     f'{d["DI"]:.4f}',
                      stat])
     # Don't pass through _v for pre-formatted HTML cells; build directly
     thead = "".join(f'<th class="proc">{h}</th>' if i == 0 else f"<th>{h}</th>"
@@ -865,15 +866,14 @@ def render_po_table(co_names, co_finals, po_contrib, po_finals):
     rows = []
     for i, co in enumerate(co_names):
         att = co_finals[i]
-        cls = "hi" if att >= 2.0 else "warn"
-        att_cell = f'<span class="{cls}">{att:.4f}</span>'
+        att_cell = f"{att:.4f}"
         cells = [co, att_cell] + [
             '<span class="zero">0</span>' if po_contrib[i,j] == 0 else f"{po_contrib[i,j]:.4f}"
             for j in range(NUM_POS)
         ]
         rows.append(cells)
     avg = ["Average", ""] + [
-        f'<span class="{"hi" if v >= 2.0 else "warn" if v > 0 else "zero"}">{v:.4f}</span>'
+        '<span class="zero">0</span>' if v <= 0 else f"{v:.4f}"
         for v in po_finals
     ]
     # Build raw (already HTML-formatted)
@@ -895,15 +895,14 @@ def render_pso_table(co_names, co_finals, pso_contrib, pso_finals):
     rows = []
     for i, co in enumerate(co_names):
         att = co_finals[i]
-        cls = "hi" if att >= 2.0 else "warn"
-        att_cell = f'<span class="{cls}">{att:.4f}</span>'
+        att_cell = f"{att:.4f}"
         cells = [co, att_cell] + [
             '<span class="zero">0</span>' if pso_contrib[i,j] == 0 else f"{pso_contrib[i,j]:.4f}"
             for j in range(NUM_PSOS)
         ]
         rows.append(cells)
     avg = ["Average", ""] + [
-        f'<span class="{"hi" if v >= 2.0 else "warn" if v > 0 else "zero"}">{v:.4f}</span>'
+        '<span class="zero">0</span>' if v <= 0 else f"{v:.4f}"
         for v in pso_finals
     ]
     thead = '<th class="proc">CO</th><th>CO Att.</th>' + "".join(f"<th>{p}</th>" for p in pso_names)
@@ -923,7 +922,7 @@ def render_pso_table(co_names, co_finals, pso_contrib, pso_finals):
 #  EXCEL EXPORT
 # ══════════════════════════════════════════════════════════════════════════
 
-def export_excel(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
+def export_excel(R, subj_name, top_pct, bot_pct, di_threshold, co_target) -> BytesIO:
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
@@ -1153,9 +1152,9 @@ def export_excel(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
         dat(ws7, ri, 2, "—" if np.isnan(int_v) else round(float(int_v), 4), even=even)
         dat(ws7, ri, 3, "—" if np.isnan(ext_v) else round(float(ext_v), 4), even=even)
         dat(ws7, ri, 4, round(float(fin_v), 4), even=even,
-            color="1740AD" if fin_v >= 2.0 else "DC2626", bold=True)
-        dat(ws7, ri, 5, "Yes" if fin_v >= 2.0 else "No", even=even,
-            color="16A34A" if fin_v >= 2.0 else "DC2626", bold=True)
+            color="1740AD" if fin_v >= co_target else "DC2626", bold=True)
+        dat(ws7, ri, 5, "Yes" if fin_v >= co_target else "No", even=even,
+            color="16A34A" if fin_v >= co_target else "DC2626", bold=True)
     apply_bd(ws7, 2, 2+NUM_COS, 1, 5)
 
     buf = BytesIO()
@@ -1228,7 +1227,7 @@ def _section_para(text, styles):
     return Paragraph(f"<b>{text}</b>", style)
 
 
-def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
+def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold, co_target) -> BytesIO:
     if not REPORTLAB_OK:
         return _fallback_pdf(R, subj_name)
 
@@ -1293,6 +1292,7 @@ def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
         ["Total Students", str(len(R["df"])), "Internal Weight", f"{R['iw']:.1f}%"],
         [f"{R.get('external_label', 'University')} Weight", f"{R['uw']:.1f}%", "DI Top Group", f"{top_pct:.0f}%"],
         ["DI Bottom Group", f"{bot_pct:.0f}%", "DI Threshold", f"{di_threshold:.2f}"],
+        ["CO Target", f"{co_target:.2f}", "", ""],
     ]
     meta_tbl = Table(meta, colWidths=[4*cm, 4*cm, 4*cm, 4*cm])
     meta_tbl.setStyle(TableStyle([
@@ -1445,18 +1445,15 @@ def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
     story.append(PageBreak())
 
     # --- KEY SUMMARY --------------------------------------------------------
-    co_ok = int((R["co_finals"] >= 2.0).sum())
     avg_co = float(np.mean(R["co_finals"])) if len(R["co_finals"]) else 0.0
     po_v = R["po_finals"]
     avg_po = float(po_v[po_v > 0].mean()) if (po_v > 0).any() else 0.0
-    low_di = sum(1 for d in R["exam_di_dict"].values() if d["DI"] < di_threshold)
     story.append(_section_para("Key Summary", styles))
     summary_data = [
         ["Metric", "Value"],
         ["Average CO Attainment", f"{avg_co:.3f} / 3.000"],
-        ["COs at Target", f"{co_ok} / {NUM_COS} (target >= 2.0)"],
         ["Average PO Attainment", f"{avg_po:.3f} / 3.000"],
-        ["Low DI Exams", f"{low_di} / {len(R['all_exams'])} below {di_threshold:.2f}"],
+        ["Total Students", f"{len(R['df'])}"],
     ]
     story.append(_rl_table(summary_data, [7*cm, usable_w - 7*cm], highlight_last=False))
     story.append(PageBreak())
@@ -1483,7 +1480,7 @@ def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
     fig, ax = plt.subplots(figsize=(7.4, 4.8))
     fig.patch.set_facecolor("white")
     ax.bar(R["co_names"], np.round(R["co_finals"], 3), color=colors_co)
-    ax.axhline(2.0, linestyle="--", color="#ef4444", lw=1.3, label="Target 2.0")
+    ax.axhline(co_target, linestyle="--", color="#ef4444", lw=1.3, label=f"Target {co_target:.2f}")
     ax.axhline(avg_co, linestyle=":", color="#1740AD", lw=1.5, label=f"CO Avg {avg_co:.3f}")
     ax.set_title("Final CO Attainment", fontsize=13, fontweight="bold")
     ax.set_ylabel("Attainment")
@@ -1521,7 +1518,7 @@ def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
     ax.bar(po_names, np.round(R["po_finals"], 3),
            color=[("#1740AD" if v >= 2.5 else "#22c55e" if v >= 2 else
                    "#f59e0b" if v >= 1 else "#ef4444") for v in R["po_finals"]])
-    ax.axhline(2.0, ls="--", color="#ef4444", lw=1.3, label="Target 2.0")
+    ax.axhline(co_target, ls="--", color="#ef4444", lw=1.3, label=f"Target {co_target:.2f}")
     ax.set_title("PO Attainment", fontsize=13, fontweight="bold")
     ax.set_ylabel("Attainment")
     ax.set_ylim(0, 3.4)
@@ -1538,7 +1535,7 @@ def export_pdf(R, subj_name, top_pct, bot_pct, di_threshold) -> BytesIO:
     fig.patch.set_facecolor("white")
     ax.bar(pso_names, np.round(R["pso_finals"], 3),
            color=["#1740AD", "#0f766e", "#b45309"][:NUM_PSOS])
-    ax.axhline(2.0, ls="--", color="#ef4444", lw=1.3, label="Target 2.0")
+    ax.axhline(co_target, ls="--", color="#ef4444", lw=1.3, label=f"Target {co_target:.2f}")
     ax.set_title("PSO Attainment", fontsize=13, fontweight="bold")
     ax.set_ylabel("Attainment")
     ax.set_ylim(0, 3.4)
@@ -1655,15 +1652,15 @@ def _cc(v):
     return "#6366f1"
 
 
-def chart_co_final(co_names, co_finals):
+def chart_co_final(co_names, co_finals, co_target):
     avg_co = float(np.mean(co_finals)) if len(co_finals) else 0.0
     fig = go.Figure(go.Bar(
         x=co_names, y=np.round(co_finals, 3),
         marker_color=[_cc(v) for v in co_finals],
         text=np.round(co_finals, 3), textposition="outside",
     ))
-    fig.add_hline(y=2.0, line_dash="dash", line_color="#ef4444",
-                  annotation_text="Target 2.0", annotation_position="top right")
+    fig.add_hline(y=co_target, line_dash="dash", line_color="#ef4444",
+                  annotation_text=f"Target {co_target:.2f}", annotation_position="top right")
     fig.add_hline(y=avg_co, line_dash="dot", line_color="#6366f1",
                   annotation_text=f"CO Avg {avg_co:.3f}",
                   annotation_position="bottom right")
@@ -1695,15 +1692,15 @@ def chart_int_ext(co_names, co_int, co_ext, iw, uw, external_label="University")
     return fig
 
 
-def chart_po(po_finals):
+def chart_po(po_finals, co_target):
     po_names = [f"PO{j+1}" for j in range(NUM_POS)]
     fig = go.Figure(go.Bar(
         x=po_names, y=np.round(po_finals, 3),
         marker_color=[_cc(v) for v in po_finals],
         text=np.round(po_finals, 3), textposition="outside",
     ))
-    fig.add_hline(y=2.0, line_dash="dash", line_color="#ef4444",
-                  annotation_text="Target 2.0", annotation_position="top right")
+    fig.add_hline(y=co_target, line_dash="dash", line_color="#ef4444",
+                  annotation_text=f"Target {co_target:.2f}", annotation_position="top right")
     ymax = float(max(po_finals.max() * 1.35, 0.5)) if len(po_finals) else 0.5
     fig.update_layout(**_chart_layout(
         title=dict(text="<b>PO Attainment</b>", font=dict(size=15, color="#0f172a"), x=0),
@@ -1713,15 +1710,15 @@ def chart_po(po_finals):
     return fig
 
 
-def chart_pso(pso_finals):
+def chart_pso(pso_finals, co_target):
     pso_names = [f"PSO{j+1}" for j in range(NUM_PSOS)]
     fig = go.Figure(go.Bar(
         x=pso_names, y=np.round(pso_finals, 3),
         marker_color=["#6366f1", "#0d9488", "#d97706"][:NUM_PSOS],
         text=np.round(pso_finals, 3), textposition="outside", width=0.45,
     ))
-    fig.add_hline(y=2.0, line_dash="dash", line_color="#ef4444",
-                  annotation_text="Target 2.0", annotation_position="top right")
+    fig.add_hline(y=co_target, line_dash="dash", line_color="#ef4444",
+                  annotation_text=f"Target {co_target:.2f}", annotation_position="top right")
     ymax = float(max(pso_finals.max() * 1.35, 0.5)) if len(pso_finals) else 0.5
     fig.update_layout(**_chart_layout(
         title=dict(text="<b>PSO Attainment</b>", font=dict(size=15, color="#0f172a"), x=0),
@@ -1831,6 +1828,7 @@ def init_state():
         "co_stmts":          list(DEFAULT_CO_STMTS),
         "iw":                DEFAULT_INTERNAL_WEIGHT,
         "uw":                DEFAULT_UNIVERSITY_WEIGHT,
+        "co_target":         DEFAULT_CO_TARGET,
         "di_top_pct":        DEFAULT_DI_TOP_PCT,
         "di_bot_pct":        DEFAULT_DI_BOT_PCT,
         "di_threshold":      DEFAULT_DI_THRESHOLD,
@@ -2022,13 +2020,6 @@ def run_app():
 
         internal_exams, external_exams, all_exams = get_exam_sets(mode)
         col_L, col_R = st.columns([1.08, 0.92], gap="small")
-        setup_pills = [
-            ("neutral", f"{mode} mode active"),
-            ("neutral", f"{len(all_exams)} exam column(s) expected"),
-            ("neutral", f"{len(practical_components) if mode == 'Practical' else len(external_exams)} external component(s)"),
-        ]
-        setup_pills_html = "".join(f'<span class="ready-pill {tone}">{label}</span>' for tone, label in setup_pills)
-        st.markdown(f'<div class="ready-strip">{setup_pills_html}</div>', unsafe_allow_html=True)
 
         # ── LEFT COLUMN ───────────────────────────────────────────────
         with col_L:
@@ -2131,15 +2122,20 @@ def run_app():
         with col_R:
             ui_section("Evaluation Rules and Mapping", "Configure weightages, discrimination index, and mappings.")
             ui_stitle("Assessment Weightages")
-            w1, w2 = st.columns(2)
+            w1, w2, w3 = st.columns(3)
             with w1:
                 iw = st.number_input("Internal Weight (%)", 0.0, 100.0,
                                      float(st.session_state.iw), 5.0, key="iw_inp")
             with w2:
                 uw = st.number_input(f"{ext_label} Weight (%)", 0.0, 100.0,
                                      float(st.session_state.uw), 5.0, key="uw_inp")
+            with w3:
+                co_target = st.number_input("CO Target", 0.0, 3.0,
+                                            float(st.session_state.co_target), 0.1,
+                                            format="%.2f", key="co_target_inp")
             st.session_state.iw = iw
             st.session_state.uw = uw
+            st.session_state.co_target = co_target
             ir, ur = normalize_weights(iw, uw)
             if abs(iw + uw - 100) > 0.01:
                 st.markdown(f'<div class="ainfo">Total = {iw+uw:.1f}%. Will be normalized to {ir*100:.1f}% / {ur*100:.1f}%.</div>',
@@ -2215,19 +2211,9 @@ def run_app():
 
         # ── CALCULATE ─────────────────────────────────────────────────
         with st.container(border=True):
-            ui_section("Run the Analysis", "Review readiness badges, then calculate attainment.")
+            ui_section("Run the Analysis", "Calculate attainment after finishing the setup.")
             calc = st.button("Calculate CO-PO Attainment", type="primary", width="stretch")
 
-            students_loaded = 0 if st.session_state.df is None else len(st.session_state.df)
-            co_filled = sum(1 for stmt in co_stmts if str(stmt).strip())
-            ready_pills = [
-                ("ok" if students_loaded > 0 else "warn", f"{students_loaded} student record(s) loaded" if students_loaded > 0 else "Marks file pending"),
-                ("ok" if co_filled == NUM_COS else "warn", f"{co_filled}/{NUM_COS} CO statements filled"),
-                ("ok" if abs(iw + uw - 100) <= 0.01 else "neutral", f"Weight total {iw + uw:.1f}%"),
-                ("neutral", f"{len(all_exams)} exam column(s) configured"),
-            ]
-            pills_html = "".join(f'<span class="ready-pill {tone}">{label}</span>' for tone, label in ready_pills)
-            st.markdown(f'<div class="ready-strip">{pills_html}</div>', unsafe_allow_html=True)
 
         if calc:
             if st.session_state.df is None:
@@ -2298,11 +2284,9 @@ def run_app():
             </div>""", unsafe_allow_html=True)
 
             # Metric strip
-            co_ok  = int((R["co_finals"] >= 2.0).sum())
             avg_co = float(R["co_finals"].mean())
             po_v   = R["po_finals"]
             avg_po = float(po_v[po_v > 0].mean()) if (po_v > 0).any() else 0.0
-            low_di = sum(1 for d in R["exam_di_dict"].values() if d["DI"] < di_t)
             n_stu  = len(R["df"])
 
             st.markdown(f"""
@@ -2312,20 +2296,10 @@ def run_app():
                 <div class="mv">{avg_co:.3f}</div>
                 <div class="ms">Out of 3.0</div>
               </div>
-              <div class="mbox" style="--ac:#10b981">
-                <div class="ml">COs at Target ≥2.0</div>
-                <div class="mv">{co_ok} / {NUM_COS}</div>
-                <div class="ms">Threshold met</div>
-              </div>
               <div class="mbox" style="--ac:#06b6d4">
                 <div class="ml">Avg PO Attainment</div>
                 <div class="mv">{avg_po:.3f}</div>
                 <div class="ms">Mapped POs only</div>
-              </div>
-              <div class="mbox" style="--ac:{'#10b981' if low_di == 0 else '#ef4444'}">
-                <div class="ml">Low DI Exams</div>
-                <div class="mv">{low_di} / {len(R["all_exams"])}</div>
-                <div class="ms">DI &lt; {di_t:.2f}</div>
               </div>
               <div class="mbox" style="--ac:#8b5cf6">
                 <div class="ml">Total Students</div>
@@ -2382,46 +2356,6 @@ def run_app():
             st.markdown(render_pso_table(co_n, R["co_finals"],
                                          R["pso_contrib"], R["pso_finals"]),
                         unsafe_allow_html=True)
-            ui_stitle("Insights & Recommendations")
-            any_issue = False
-
-            for co, val in zip(co_n, R["co_finals"]):
-                if val < 2.0:
-                    any_issue = True
-                    st.markdown(f"""
-                    <div class="awarn">
-                      <b>{co} — Attainment LOW ({val:.4f})</b><br>
-                      • Revise teaching strategy for this CO<br>
-                      • Conduct remedial sessions / extra tutorials<br>
-                      • Align exam questions to Bloom's taxonomy
-                    </div>""", unsafe_allow_html=True)
-
-            for exam, d in R["exam_di_dict"].items():
-                if d["DI"] < di_t:
-                    any_issue = True
-                    st.markdown(f"""
-                    <div class="awarn">
-                      <b>{exam} — Low DI = {d['DI']:.4f} (threshold {di_t:.2f})</b><br>
-                      • Question paper does not differentiate well<br>
-                      • Rebalance difficulty: Easy 30% / Medium 50% / Hard 20%<br>
-                      • Add Higher Order Thinking (HOT) questions
-                    </div>""", unsafe_allow_html=True)
-
-            good_cos = [(n, v) for n, v in zip(co_n, R["co_finals"]) if v >= 2.5]
-            if good_cos:
-                st.markdown(f"""
-                <div class="agood">
-                  <b>High-performing COs:</b> {', '.join(f'{n} ({v:.3f})' for n, v in good_cos)}<br>
-                  Excellent outcomes for these COs — maintain current approach.
-                </div>""", unsafe_allow_html=True)
-
-            if not any_issue:
-                st.markdown("""
-                <div class="agood">
-                  <b>All CO targets (≥ 2.0) met and DI values healthy!</b><br>
-                  Course is on track for NBA accreditation.
-                </div>""", unsafe_allow_html=True)
-
             st.markdown(f"""
             <div class="ainfo">
               <b>Formula notes</b> &nbsp;
@@ -2439,6 +2373,7 @@ def run_app():
             R    = st.session_state.results
             co_n = R["co_names"]
             di_t = st.session_state.di_threshold
+            co_target = st.session_state.co_target
             ui_section(
                 "Performance Visuals",
                 "Side-by-side charts for academic review and accreditation discussions.",
@@ -2446,7 +2381,7 @@ def run_app():
 
             g1, g2 = st.columns(2, gap="medium")
             with g1:
-                st.plotly_chart(chart_co_final(co_n, R["co_finals"]),
+                st.plotly_chart(chart_co_final(co_n, R["co_finals"], co_target),
                                 width="stretch")
             with g2:
                 st.plotly_chart(chart_int_ext(co_n, R["co_int_att"],
@@ -2455,9 +2390,9 @@ def run_app():
 
             g3, g4 = st.columns(2, gap="medium")
             with g3:
-                st.plotly_chart(chart_po(R["po_finals"]), width="stretch")
+                st.plotly_chart(chart_po(R["po_finals"], co_target), width="stretch")
             with g4:
-                st.plotly_chart(chart_pso(R["pso_finals"]), width="stretch")
+                st.plotly_chart(chart_pso(R["pso_finals"], co_target), width="stretch")
 
             g5, g6 = st.columns(2, gap="medium")
             with g5:
@@ -2478,6 +2413,7 @@ def run_app():
             top_p = st.session_state.di_top_pct
             bot_p = st.session_state.di_bot_pct
             di_t  = st.session_state.di_threshold
+            co_target = st.session_state.co_target
 
             st.markdown('<div class="download-grid"><div class="download-card"><div class="dk">Workbook export</div><div class="dv">Excel report</div><div class="ds">Multi-sheet output for data review, archival, and committee sharing.</div></div><div class="download-card"><div class="dk">Printable export</div><div class="dv">PDF report</div><div class="ds">A polished A4 summary for presentation, documentation, and accreditation evidence.</div></div></div>', unsafe_allow_html=True)
             ui_stitle("Download Reports")
@@ -2489,8 +2425,8 @@ def run_app():
             </div>""", unsafe_allow_html=True)
 
             with st.spinner("Building Excel + PDF reports…"):
-                excel_buf = export_excel(R, st.session_state.subj_name, top_p, bot_p, di_t)
-                pdf_buf   = export_pdf(R, st.session_state.subj_name, top_p, bot_p, di_t)
+                excel_buf = export_excel(R, st.session_state.subj_name, top_p, bot_p, di_t, co_target)
+                pdf_buf   = export_pdf(R, st.session_state.subj_name, top_p, bot_p, di_t, co_target)
                 excel_bytes = excel_buf.getvalue()
                 pdf_bytes   = pdf_buf.getvalue()
 
@@ -2527,7 +2463,7 @@ def run_app():
                     "Internal":    ["—" if np.isnan(v) else f"{v:.4f}" for v in R["co_int_att"]],
                     R.get("external_label", "University"):  ["—" if np.isnan(v) else f"{v:.4f}" for v in R["co_ext_att"]],
                     "Final":       np.round(R["co_finals"], 4),
-                    "Target":      [_attainment_status_met(v) for v in R["co_finals"]],
+                    "Target":      [_attainment_status_met(v, co_target) for v in R["co_finals"]],
                 })
                 st.dataframe(co_df, width="stretch", hide_index=True)
             with p2:
@@ -2535,7 +2471,7 @@ def run_app():
                 po_df = pd.DataFrame({
                     "PO":          [f"PO{j+1}" for j in range(NUM_POS)],
                     "Attainment":  np.round(R["po_finals"], 4),
-                    "Status":      [_attainment_status_short(v) for v in R["po_finals"]],
+                    "Status":      [_attainment_status_short(v, co_target) for v in R["po_finals"]],
                 })
                 st.dataframe(po_df, width="stretch", hide_index=True)
             with p3:
@@ -2543,7 +2479,7 @@ def run_app():
                 pso_df = pd.DataFrame({
                     "PSO":         [f"PSO{j+1}" for j in range(NUM_PSOS)],
                     "Attainment":  np.round(R["pso_finals"], 4),
-                    "Status":      [_attainment_status_short(v) for v in R["pso_finals"]],
+                    "Status":      [_attainment_status_short(v, co_target) for v in R["pso_finals"]],
                 })
                 st.dataframe(pso_df, width="stretch", hide_index=True)
 
